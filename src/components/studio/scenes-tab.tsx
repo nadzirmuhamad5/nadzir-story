@@ -72,10 +72,10 @@ export default function ScenesTab({
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-400">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-[#C93A1B]">
             Papan Adegan
           </h2>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-stone-600">
             Gambar adegan dipakai sebagai frame pertama video — hasilnya konsisten.
           </p>
         </div>
@@ -83,7 +83,7 @@ export default function ScenesTab({
           <Button
             variant="outline"
             onClick={() => void onAddScene()}
-            className="h-10 border-zinc-700 bg-transparent px-3 font-semibold text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+            className="h-10 border-stone-300 bg-white px-3 font-semibold text-stone-700 hover:bg-stone-100 hover:text-stone-900"
           >
             <Plus className="h-4 w-4" aria-hidden="true" />
             Adegan Manual
@@ -105,9 +105,9 @@ export default function ScenesTab({
       </div>
 
       {ordered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-zinc-700 bg-zinc-900/30 px-6 py-14 text-center">
-          <Images className="h-8 w-8 text-zinc-600" aria-hidden="true" />
-          <p className="max-w-md text-sm leading-relaxed text-zinc-400">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-stone-300 bg-white px-6 py-14 text-center">
+          <Images className="h-8 w-8 text-stone-400" aria-hidden="true" />
+          <p className="max-w-md text-sm leading-relaxed text-stone-600">
             {hasStory
               ? "Belum ada adegan. Klik \"Bagi Cerita jadi Adegan\" — AI memecah naskahmu menjadi adegan lengkap dengan prompt gambar & video."
               : "Naskah masih kosong. Buka tab Cerita, tulis premis, dan generate cerita dulu."}
@@ -121,7 +121,7 @@ export default function ScenesTab({
             return (
               <li
                 key={s.id}
-                className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3.5 sm:p-4"
+                className="rounded-xl border border-stone-200 bg-[#FCFAF4] p-3.5 sm:p-4"
               >
                 {/* kepala adegan */}
                 <div className="flex items-center gap-2">
@@ -137,15 +137,15 @@ export default function ScenesTab({
                         void onPatchScene(s.id, { title: e.target.value });
                     }}
                     placeholder="Judul adegan"
-                    className="min-w-0 flex-1 rounded-md border border-transparent bg-transparent px-2 py-1 text-sm font-semibold text-zinc-100 outline-none transition-colors hover:border-zinc-700 focus:border-zinc-600"
+                    className="min-w-0 flex-1 rounded-md border border-transparent bg-transparent px-2 py-1 text-sm font-semibold text-stone-900 outline-none transition-colors hover:border-stone-300 focus:border-stone-400"
                   />
                   {s.status === "video-processing" && (
-                    <Badge className="shrink-0 animate-pulse bg-amber-500/15 font-mono text-[10px] text-amber-400">
+                    <Badge className="shrink-0 animate-pulse border border-amber-200 bg-amber-100 font-mono text-[10px] text-amber-800">
                       video diproses…
                     </Badge>
                   )}
                   {s.status === "video-failed" && (
-                    <Badge className="shrink-0 bg-red-500/15 font-mono text-[10px] text-red-400">
+                    <Badge className="shrink-0 border border-red-200 bg-red-100 font-mono text-[10px] text-red-700">
                       video gagal
                     </Badge>
                   )}
@@ -155,7 +155,7 @@ export default function ScenesTab({
                       aria-label="Naikkan urutan adegan"
                       disabled={i === 0}
                       onClick={() => void onMoveScene(s.id, -1)}
-                      className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-200 disabled:opacity-30"
+                      className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-stone-200/70 hover:text-stone-900 disabled:opacity-30"
                     >
                       <ChevronUp className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>
@@ -164,7 +164,7 @@ export default function ScenesTab({
                       aria-label="Turunkan urutan adegan"
                       disabled={i === ordered.length - 1}
                       onClick={() => void onMoveScene(s.id, 1)}
-                      className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-200 disabled:opacity-30"
+                      className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-stone-200/70 hover:text-stone-900 disabled:opacity-30"
                     >
                       <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>
@@ -172,7 +172,7 @@ export default function ScenesTab({
                       type="button"
                       aria-label={`Hapus adegan ${i + 1}`}
                       onClick={() => setDeleteTarget(s)}
-                      className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-red-500/15 hover:text-red-400"
+                      className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-red-50 hover:text-red-600"
                     >
                       <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>
@@ -182,7 +182,7 @@ export default function ScenesTab({
                 <div className="mt-3 grid grid-cols-1 gap-4 md:grid-cols-[300px,1fr]">
                   {/* visual */}
                   <div className="flex flex-col gap-2">
-                    <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950">
+                    <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-stone-200 bg-stone-200/60">
                       {s.imageUrl ? (
                         <Image
                           src={s.imageUrl}
@@ -193,7 +193,7 @@ export default function ScenesTab({
                           className="object-cover"
                         />
                       ) : (
-                        <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-zinc-600">
+                        <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 text-stone-400">
                           <Images className="h-7 w-7" aria-hidden="true" />
                           <span className="font-mono text-[10px] uppercase tracking-widest">
                             16:9 · belum ada gambar
@@ -201,12 +201,12 @@ export default function ScenesTab({
                         </div>
                       )}
                       {imgBusy && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-zinc-950/80 backdrop-blur-sm">
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-stone-200/70 backdrop-blur-sm">
                           <Loader2
-                            className="h-6 w-6 animate-spin text-[#D1FE17]"
+                            className="h-6 w-6 animate-spin text-[#C93A1B]"
                             aria-hidden="true"
                           />
-                          <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-300">
+                          <span className="font-mono text-[10px] uppercase tracking-widest text-stone-600">
                             Melukis adegan…
                           </span>
                         </div>
@@ -216,7 +216,7 @@ export default function ScenesTab({
                       size="sm"
                       disabled={imgBusy}
                       onClick={() => void onGenerateImage(s.id)}
-                      className="h-9 w-full border-zinc-700 bg-zinc-950 font-semibold text-zinc-100 hover:border-[#C93A1B]/60 hover:bg-zinc-900"
+                      className="h-9 w-full border-stone-300 bg-white font-semibold text-stone-900 hover:border-[#C93A1B]/60 hover:bg-stone-100"
                       variant="outline"
                     >
                       {imgBusy ? (
@@ -231,7 +231,7 @@ export default function ScenesTab({
                         src={s.videoUrl}
                         controls
                         preload="metadata"
-                        className="w-full rounded-lg border border-zinc-800 bg-black"
+                        className="w-full rounded-lg border border-stone-200 bg-black"
                         aria-label={`Video adegan ${i + 1}`}
                       />
                     )}
@@ -240,7 +240,7 @@ export default function ScenesTab({
                   {/* teks */}
                   <div className="flex min-w-0 flex-col gap-2.5">
                     <div className="flex flex-col gap-1">
-                      <Label className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+                      <Label className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
                         Narasi / dialog
                       </Label>
                       <Textarea
@@ -251,12 +251,12 @@ export default function ScenesTab({
                             void onPatchScene(s.id, { narration: e.target.value });
                         }}
                         placeholder="Apa yang terjadi & dikatakan di adegan ini…"
-                        className="min-h-[72px] border-zinc-700 bg-zinc-950 text-xs leading-relaxed"
+                        className="min-h-[72px] border-stone-300 bg-white text-stone-900 text-xs leading-relaxed placeholder:text-stone-400"
                         aria-label={`Narasi adegan ${i + 1}`}
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <Label className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+                      <Label className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
                         Prompt gambar (untuk AI)
                       </Label>
                       <Textarea
@@ -267,12 +267,12 @@ export default function ScenesTab({
                             void onPatchScene(s.id, { imagePrompt: e.target.value });
                         }}
                         placeholder="Deskripsi visual adegan — Inggris disarankan…"
-                        className="min-h-[56px] border-zinc-700 bg-zinc-950 font-mono text-[11px] leading-relaxed"
+                        className="min-h-[56px] border-stone-300 bg-white text-stone-900 font-mono text-[11px] leading-relaxed placeholder:text-stone-400"
                         aria-label={`Prompt gambar adegan ${i + 1}`}
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <Label className="font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+                      <Label className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
                         Prompt video (gerakan kamera)
                       </Label>
                       <Textarea
@@ -283,7 +283,7 @@ export default function ScenesTab({
                             void onPatchScene(s.id, { videoPrompt: e.target.value });
                         }}
                         placeholder="Slow dolly-in, awan bergerak, orang berjalan…"
-                        className="min-h-[56px] border-zinc-700 bg-zinc-950 font-mono text-[11px] leading-relaxed"
+                        className="min-h-[56px] border-stone-300 bg-white text-stone-900 font-mono text-[11px] leading-relaxed placeholder:text-stone-400"
                         aria-label={`Prompt video adegan ${i + 1}`}
                       />
                     </div>
@@ -305,7 +305,7 @@ export default function ScenesTab({
                             ? "Buat Ulang Video"
                             : "Buat Video AI"}
                       </Button>
-                      <span className="font-mono text-[10px] leading-relaxed text-zinc-600">
+                      <span className="font-mono text-[10px] leading-relaxed text-stone-500">
                         {s.imageUrl
                           ? "frame pertama = gambar adegan · ±1–5 menit"
                           : "tanpa gambar: text-to-video · ±1–5 menit"}
@@ -321,17 +321,17 @@ export default function ScenesTab({
 
       {/* Konfirmasi pecah ulang */}
       <AlertDialog open={confirmSplit} onOpenChange={setConfirmSplit}>
-        <AlertDialogContent className="border-zinc-700 bg-zinc-900 text-zinc-100">
+        <AlertDialogContent className="border-stone-200 bg-[#FCFAF4] text-stone-900">
           <AlertDialogHeader>
             <AlertDialogTitle>Ganti {ordered.length} adegan yang ada?</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
+            <AlertDialogDescription className="text-stone-600">
               AI akan memecah ulang naskah dan mengganti seluruh adegan sekarang (gambar &amp;
               video adegan lama ikut hilang dari daftar). Adegan manual bisa ditambah lewat
               tombol &quot;Adegan Manual&quot;.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100">
+            <AlertDialogCancel className="border-stone-300 bg-white text-stone-700 hover:bg-stone-100 hover:text-stone-900">
               Batal
             </AlertDialogCancel>
             <AlertDialogAction
@@ -349,15 +349,15 @@ export default function ScenesTab({
 
       {/* Konfirmasi hapus adegan */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
-        <AlertDialogContent className="border-zinc-700 bg-zinc-900 text-zinc-100">
+        <AlertDialogContent className="border-stone-200 bg-[#FCFAF4] text-stone-900">
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus adegan ini?</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
+            <AlertDialogDescription className="text-stone-600">
               Narasi, prompt, gambar, dan video adegan akan dihapus permanen.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100">
+            <AlertDialogCancel className="border-stone-300 bg-white text-stone-700 hover:bg-stone-100 hover:text-stone-900">
               Batal
             </AlertDialogCancel>
             <AlertDialogAction

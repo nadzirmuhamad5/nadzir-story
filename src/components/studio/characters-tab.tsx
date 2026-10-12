@@ -79,10 +79,10 @@ export default function CharactersTab({
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-400">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-[#C93A1B]">
             Buku Karakter
           </h2>
-          <p className="mt-1 text-xs text-zinc-500">
+          <p className="mt-1 text-xs text-stone-600">
             Deskripsi karakter dipakai AI saat membuat potret &amp; konsistensi wajah.
           </p>
         </div>
@@ -96,16 +96,16 @@ export default function CharactersTab({
       </div>
 
       {characters.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-zinc-700 bg-zinc-900/30 px-6 py-14 text-center">
-          <UserRound className="h-8 w-8 text-zinc-600" aria-hidden="true" />
-          <p className="max-w-sm text-sm leading-relaxed text-zinc-400">
+        <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-stone-300 bg-white px-6 py-14 text-center">
+          <UserRound className="h-8 w-8 text-stone-400" aria-hidden="true" />
+          <p className="max-w-sm text-sm leading-relaxed text-stone-600">
             Belum ada karakter. Tambahkan tokoh utama, antagonis, atau pendukung — lalu buat
             potretnya dengan AI.
           </p>
           <Button
             onClick={openCreate}
             variant="outline"
-            className="mt-1 border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+            className="mt-1 border-stone-300 bg-white text-stone-700 hover:bg-stone-100 hover:text-stone-900"
           >
             <Plus className="h-4 w-4" aria-hidden="true" />
             Tambah karakter pertama
@@ -118,9 +118,9 @@ export default function CharactersTab({
             return (
               <article
                 key={c.id}
-                className="flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/60"
+                className="flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-[#FCFAF4]"
               >
-                <div className="relative aspect-square w-full bg-zinc-950">
+                <div className="relative aspect-square w-full bg-stone-200/60">
                   {c.imageUrl ? (
                     <Image
                       src={c.imageUrl}
@@ -131,7 +131,7 @@ export default function CharactersTab({
                       className="object-cover"
                     />
                   ) : (
-                    <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-zinc-600">
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-stone-400">
                       <UserRound className="h-10 w-10" aria-hidden="true" />
                       <span className="font-mono text-[10px] uppercase tracking-widest">
                         Belum ada potret
@@ -139,9 +139,9 @@ export default function CharactersTab({
                     </div>
                   )}
                   {busy && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-zinc-950/80 backdrop-blur-sm">
-                      <Loader2 className="h-7 w-7 animate-spin text-[#D1FE17]" aria-hidden="true" />
-                      <span className="font-mono text-[10px] uppercase tracking-widest text-zinc-300">
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-stone-200/70 backdrop-blur-sm">
+                      <Loader2 className="h-7 w-7 animate-spin text-[#C93A1B]" aria-hidden="true" />
+                      <span className="font-mono text-[10px] uppercase tracking-widest text-stone-600">
                         Menggambar…
                       </span>
                     </div>
@@ -149,13 +149,13 @@ export default function CharactersTab({
                 </div>
                 <div className="flex flex-1 flex-col gap-2 p-3.5">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-bold tracking-tight text-zinc-100">{c.name}</h3>
+                    <h3 className="font-bold tracking-tight text-stone-900">{c.name}</h3>
                     <div className="flex shrink-0 items-center gap-0.5">
                       <button
                         type="button"
                         aria-label={`Sunting karakter ${c.name}`}
                         onClick={() => openEdit(c)}
-                        className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+                        className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-stone-200/70 hover:text-stone-900"
                       >
                         <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
                       </button>
@@ -163,20 +163,20 @@ export default function CharactersTab({
                         type="button"
                         aria-label={`Hapus karakter ${c.name}`}
                         onClick={() => setDeleteTarget(c)}
-                        className="rounded-md p-1.5 text-zinc-500 transition-colors hover:bg-red-500/15 hover:text-red-400"
+                        className="rounded-md p-1.5 text-stone-500 transition-colors hover:bg-red-50 hover:text-red-600"
                       >
                         <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                       </button>
                     </div>
                   </div>
-                  <p className="line-clamp-3 text-xs leading-relaxed text-zinc-400">
+                  <p className="line-clamp-3 text-xs leading-relaxed text-stone-600">
                     {c.description || "Tanpa deskripsi."}
                   </p>
                   <Button
                     size="sm"
                     disabled={busy}
                     onClick={() => void onGeneratePortrait(c.id)}
-                    className="mt-auto h-9 w-full border-zinc-700 bg-zinc-950 font-semibold text-zinc-100 hover:border-[#C93A1B]/60 hover:bg-zinc-900"
+                    className="mt-auto h-9 w-full border-stone-300 bg-white font-semibold text-stone-900 hover:border-[#C93A1B]/60 hover:bg-stone-100"
                     variant="outline"
                   >
                     {busy ? (
@@ -197,16 +197,16 @@ export default function CharactersTab({
 
       {/* Dialog tambah/sunting */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="border-zinc-700 bg-zinc-900 text-zinc-100 sm:max-w-md">
+        <DialogContent className="border-stone-200 bg-[#FCFAF4] text-stone-900 sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{editing ? "Sunting Karakter" : "Karakter Baru"}</DialogTitle>
-            <DialogDescription className="text-zinc-400">
+            <DialogDescription className="text-stone-600">
               Jelaskan penampilan &amp; wataknya — semakin detail, semakin konsisten potretnya.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="ch-name" className="text-xs text-zinc-400">
+              <Label htmlFor="ch-name" className="text-xs text-stone-600">
                 Nama
               </Label>
               <Input
@@ -214,11 +214,11 @@ export default function CharactersTab({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="mis. Ki Daru"
-                className="border-zinc-700 bg-zinc-950"
+                className="border-stone-300 bg-white text-stone-900 placeholder:text-stone-400"
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="ch-desc" className="text-xs text-zinc-400">
+              <Label htmlFor="ch-desc" className="text-xs text-stone-600">
                 Deskripsi
               </Label>
               <Textarea
@@ -226,7 +226,7 @@ export default function CharactersTab({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="mis. Lelaki 50 tahun, kurus, berjanggut putih, memakai beskap cokelat dan blangkon, tatapan tajam"
-                className="min-h-[100px] border-zinc-700 bg-zinc-950"
+                className="min-h-[100px] border-stone-300 bg-white text-stone-900 placeholder:text-stone-400"
               />
             </div>
           </div>
@@ -234,7 +234,7 @@ export default function CharactersTab({
             <Button
               variant="outline"
               onClick={() => setDialogOpen(false)}
-              className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+              className="border-stone-300 bg-white text-stone-700 hover:bg-stone-100 hover:text-stone-900"
             >
               Batal
             </Button>
@@ -256,15 +256,15 @@ export default function CharactersTab({
 
       {/* Konfirmasi hapus */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
-        <AlertDialogContent className="border-zinc-700 bg-zinc-900 text-zinc-100">
+        <AlertDialogContent className="border-stone-200 bg-[#FCFAF4] text-stone-900">
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus karakter &quot;{deleteTarget?.name}&quot;?</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
+            <AlertDialogDescription className="text-stone-600">
               Potret dan deskripsinya akan hilang dari buku karakter proyek ini.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100">
+            <AlertDialogCancel className="border-stone-300 bg-white text-stone-700 hover:bg-stone-100 hover:text-stone-900">
               Batal
             </AlertDialogCancel>
             <AlertDialogAction

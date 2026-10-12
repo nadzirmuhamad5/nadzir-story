@@ -35,20 +35,20 @@ export default function StoryTab({ project, busy, onGenerateStory, onPatch }: Pr
       {/* Kolom ide */}
       <section
         aria-label="Ide dan premis"
-        className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 sm:p-5"
+        className="flex flex-col rounded-xl border border-stone-200 bg-[#FCFAF4] p-4 sm:p-5"
       >
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-400">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-[#C93A1B]">
             1 · Ide &amp; Premis
           </h2>
-          <span className="font-mono text-[10px] text-zinc-600">
+          <span className="font-mono text-[10px] text-stone-400">
             {project.premise.length} karakter
           </span>
         </div>
-        <p className="mt-2 text-xs leading-relaxed text-zinc-500">
+        <p className="mt-2 text-xs leading-relaxed text-stone-600">
           Satu kalimat saja cukup. AI menulis cerita utuh sesuai genre{" "}
-          <span className="text-zinc-300">{project.genre}</span> dan gaya visual{" "}
-          <span className="text-zinc-300">{styleLabelOf(project.style)}</span>.
+          <span className="text-stone-900">{project.genre}</span> dan gaya visual{" "}
+          <span className="text-stone-900">{styleLabelOf(project.style)}</span>.
         </p>
         <Textarea
           ref={premiseRef}
@@ -59,7 +59,7 @@ export default function StoryTab({ project, busy, onGenerateStory, onPatch }: Pr
             if (v !== project.premise) void onPatch({ premise: v });
           }}
           placeholder="mis. Seorang nelayan muda menemukan lampu tua di pantai yang bisa memanggil badai…"
-          className="mt-3 min-h-[150px] flex-1 resize-none border-zinc-700 bg-zinc-950 text-sm leading-relaxed"
+          className="mt-3 min-h-[150px] flex-1 resize-none border-stone-300 bg-white text-stone-900 placeholder:text-stone-400 text-sm leading-relaxed"
           aria-label="Premis cerita"
         />
         <Button
@@ -74,7 +74,7 @@ export default function StoryTab({ project, busy, onGenerateStory, onPatch }: Pr
           )}
           {busy ? "Menulis cerita…" : "Buat Cerita dengan AI"}
         </Button>
-        <p className="mt-2.5 text-center font-mono text-[10px] leading-relaxed text-zinc-600">
+        <p className="mt-2.5 text-center font-mono text-[10px] leading-relaxed text-stone-500">
           10–40 detik · judul &amp; logline ikut dibuatkan
         </p>
       </section>
@@ -82,14 +82,14 @@ export default function StoryTab({ project, busy, onGenerateStory, onPatch }: Pr
       {/* Kolom naskah */}
       <section
         aria-label="Naskah cerita"
-        className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 sm:p-5"
+        className="flex flex-col rounded-xl border border-stone-200 bg-[#FCFAF4] p-4 sm:p-5"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-zinc-400">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-[#C93A1B]">
             2 · Naskah
           </h2>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[10px] text-zinc-600">
+            <span className="font-mono text-[10px] text-stone-400">
               {project.story.length} karakter
             </span>
             <Button
@@ -102,7 +102,7 @@ export default function StoryTab({ project, busy, onGenerateStory, onPatch }: Pr
                 });
                 toast.success("Naskah tersimpan");
               }}
-              className="h-8 border-zinc-700 bg-transparent px-3 text-xs text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+              className="h-8 border-stone-300 bg-white px-3 text-xs text-stone-700 hover:bg-stone-100 hover:text-stone-900"
             >
               <Save className="h-3.5 w-3.5" aria-hidden="true" />
               Simpan
@@ -113,7 +113,7 @@ export default function StoryTab({ project, busy, onGenerateStory, onPatch }: Pr
         <div className="mt-3 flex flex-col gap-1.5">
           <Label
             htmlFor="logline"
-            className="font-mono text-[10px] uppercase tracking-widest text-zinc-500"
+            className="font-mono text-[10px] uppercase tracking-widest text-stone-500"
           >
             Logline
           </Label>
@@ -128,14 +128,14 @@ export default function StoryTab({ project, busy, onGenerateStory, onPatch }: Pr
               if (v !== project.logline) void onPatch({ logline: v });
             }}
             placeholder="Satu kalimat yang merangkum seluruh cerita"
-            className="border-zinc-700 bg-zinc-950 text-sm"
+            className="border-stone-300 bg-white text-stone-900 placeholder:text-stone-400 text-sm"
           />
         </div>
 
         <div className="mt-3 flex min-h-0 flex-1 flex-col gap-1.5">
           <Label
             htmlFor="story"
-            className="font-mono text-[10px] uppercase tracking-widest text-zinc-500"
+            className="font-mono text-[10px] uppercase tracking-widest text-stone-500"
           >
             Cerita lengkap — tiap paragraf menjadi satu adegan
           </Label>
@@ -150,10 +150,10 @@ export default function StoryTab({ project, busy, onGenerateStory, onPatch }: Pr
               if (v !== project.story) void onPatch({ story: v });
             }}
             placeholder="Naskah cerita muncul di sini — atau tulis sendiri. Nantinya dipecah menjadi adegan di tab Adegan."
-            className="min-h-[360px] flex-1 border-zinc-700 bg-zinc-950 text-sm leading-relaxed"
+            className="min-h-[360px] flex-1 border-stone-300 bg-white text-stone-900 placeholder:text-stone-400 text-sm leading-relaxed"
           />
         </div>
-        <p className="mt-2 font-mono text-[10px] text-zinc-600">
+        <p className="mt-2 font-mono text-[10px] text-stone-500">
           Tersimpan otomatis saat keluar dari kolom.
         </p>
       </section>

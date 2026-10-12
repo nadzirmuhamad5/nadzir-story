@@ -425,7 +425,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
           className={`group relative flex cursor-pointer flex-col gap-0.5 rounded-lg border px-3 py-2.5 transition-colors ${
             activeId === p.id
               ? "border-[#C93A1B]/60 bg-[#C93A1B]/10"
-              : "border-transparent hover:border-zinc-700 hover:bg-zinc-800/60"
+              : "border-transparent hover:border-stone-300 hover:bg-stone-100"
           }`}
           onClick={() => void openProject(p.id)}
           role="button"
@@ -435,14 +435,14 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
           }}
           aria-label={`Buka proyek ${p.title}`}
         >
-          <span className="truncate pr-7 text-sm font-semibold text-zinc-100">{p.title}</span>
-          <span className="font-mono text-[11px] text-zinc-500">
+          <span className="truncate pr-7 text-sm font-semibold text-stone-900">{p.title}</span>
+          <span className="font-mono text-[11px] text-stone-500">
             {p.genre} · {p.sceneCount} adegan · {formatDateTime(p.updatedAt)}
           </span>
           <button
             type="button"
             aria-label={`Hapus proyek ${p.title}`}
-            className="absolute right-2 top-2 rounded-md p-1.5 text-zinc-500 opacity-0 transition-all hover:bg-red-500/15 hover:text-red-400 focus-visible:opacity-100 group-hover:opacity-100"
+            className="absolute right-2 top-2 rounded-md p-1.5 text-stone-500 opacity-0 transition-all hover:bg-red-50 hover:text-red-600 focus-visible:opacity-100 group-hover:opacity-100"
             onClick={(e) => {
               e.stopPropagation();
               setDeleteTarget(p);
@@ -453,7 +453,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
         </div>
       ))}
       {!loadingList && projects.length === 0 && (
-        <p className="px-3 py-6 text-center text-xs leading-relaxed text-zinc-500">
+        <p className="px-3 py-6 text-center text-xs leading-relaxed text-stone-500">
           Belum ada proyek.
           <br />
           Klik tombol + untuk mulai.
@@ -463,16 +463,16 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
   );
 
   return (
-    <div className="flex h-dvh flex-col bg-zinc-950 text-zinc-100">
+    <div className="flex h-dvh flex-col bg-[#F3EFE8] text-stone-900">
       {/* Header */}
-      <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-zinc-800 bg-zinc-950 px-3 sm:px-4">
+      <header className="flex h-14 shrink-0 items-center justify-between gap-2 border-b border-stone-200 bg-[#FCFAF4] px-3 sm:px-4">
         <div className="flex min-w-0 items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={onBack}
             aria-label="Kembali ke beranda"
-            className="h-9 w-9 shrink-0 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
+            className="h-9 w-9 shrink-0 text-stone-500 hover:bg-stone-200/70 hover:text-stone-900"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
           </Button>
@@ -483,7 +483,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
             <span className="truncate text-sm font-bold tracking-tight sm:text-base">
               Nadzir Story
             </span>
-            <Badge className="hidden bg-[#D1FE17] font-mono text-[10px] text-zinc-900 sm:inline-flex">
+            <Badge className="hidden bg-[#D1FE17] font-mono text-[10px] text-stone-900 sm:inline-flex">
               STUDIO WEB
             </Badge>
           </div>
@@ -505,7 +505,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Repo GitHub Nadzir Story"
-            className="flex h-9 w-9 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+            className="flex h-9 w-9 items-center justify-center rounded-md text-stone-500 transition-colors hover:bg-stone-200/70 hover:text-stone-900"
           >
             <Github className="h-4 w-4" aria-hidden="true" />
           </a>
@@ -514,15 +514,15 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
 
       <div className="flex min-h-0 flex-1">
         {/* Sidebar desktop */}
-        <aside className="hidden w-64 shrink-0 flex-col border-r border-zinc-800 bg-zinc-900/40 md:flex">
+        <aside className="hidden w-64 shrink-0 flex-col border-r border-stone-200 bg-[#FCFAF4]/70 md:flex">
           <div className="flex items-center justify-between px-4 pb-2 pt-4">
-            <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-zinc-500">
+            <h2 className="font-mono text-xs font-semibold uppercase tracking-widest text-[#C93A1B]">
               Proyek
             </h2>
             <Button
               size="icon"
               variant="ghost"
-              className="h-7 w-7 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100"
+              className="h-7 w-7 text-stone-500 hover:bg-stone-200/70 hover:text-stone-900"
               aria-label="Buat proyek baru"
               onClick={() => {
                 setForm(EMPTY_FORM);
@@ -533,7 +533,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
             </Button>
           </div>
           <ScrollArea className="min-h-0 flex-1 px-2 pb-4">{sidebarList}</ScrollArea>
-          <p className="border-t border-zinc-800 px-4 py-3 font-mono text-[10px] leading-relaxed text-zinc-600">
+          <p className="border-t border-stone-200 px-4 py-3 font-mono text-[10px] leading-relaxed text-stone-500">
             Data tersimpan lokal di SQLite.
           </p>
         </aside>
@@ -542,7 +542,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
         <main className="flex min-w-0 flex-1 flex-col">
           {!project ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-              <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-zinc-900 text-[#C93A1B]">
+              <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#FCFAF4] border border-stone-200 text-[#C93A1B]">
                 {loadingList ? (
                   <Loader2 className="h-7 w-7 animate-spin" aria-hidden="true" />
                 ) : (
@@ -551,7 +551,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
               </span>
               <div>
                 <h1 className="text-xl font-bold tracking-tight">Selamat datang di Studio</h1>
-                <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-zinc-400">
+                <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-stone-600">
                   Pilih proyek di panel kiri, atau buat proyek baru untuk mulai mengubah satu ide
                   menjadi naskah, karakter, adegan, gambar, dan video AI.
                 </p>
@@ -570,19 +570,19 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
           ) : (
             <>
               {/* Baris judul & meta */}
-              <div className="flex flex-wrap items-center gap-2 border-b border-zinc-800 px-3 py-2.5 sm:px-4">
+              <div className="flex flex-wrap items-center gap-2 border-b border-stone-200 px-3 py-2.5 sm:px-4">
                 <div className="md:hidden">
                   <Select
                     value={activeId ?? undefined}
                     onValueChange={(v) => void openProject(v)}
                   >
                     <SelectTrigger
-                      className="h-9 w-[150px] border-zinc-700 bg-zinc-900 text-xs"
+                      className="h-9 w-[150px] border-stone-300 bg-white text-xs text-stone-900"
                       aria-label="Pilih proyek"
                     >
                       <SelectValue placeholder="Pilih proyek" />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-900 border-zinc-700">
+                    <SelectContent className="bg-[#FCFAF4] border-stone-200">
                       {projects.map((p) => (
                         <SelectItem key={p.id} value={p.id} className="text-xs">
                           {p.title}
@@ -600,7 +600,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
                     if (v && v !== project.title) void patchProject({ title: v });
                     else if (!v) setProject((p) => (p ? { ...p, title: "Proyek Tanpa Judul" } : p));
                   }}
-                  className="min-w-[140px] flex-1 border-transparent bg-transparent px-2 text-base font-bold tracking-tight hover:border-zinc-700 focus-visible:border-zinc-600 sm:text-lg"
+                  className="min-w-[140px] flex-1 border-transparent bg-transparent px-2 text-base font-bold tracking-tight hover:border-stone-300 focus-visible:border-stone-400 sm:text-lg"
                 />
                 <div className="flex items-center gap-1.5">
                   <Select
@@ -608,12 +608,12 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
                     onValueChange={(v) => void patchProject({ genre: v })}
                   >
                     <SelectTrigger
-                      className="h-9 w-[140px] border-zinc-700 bg-zinc-900 text-xs"
+                      className="h-9 w-[140px] border-stone-300 bg-white text-xs text-stone-900"
                       aria-label="Genre cerita"
                     >
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="border-zinc-700 bg-zinc-900">
+                    <SelectContent className="border-stone-200 bg-[#FCFAF4]">
                       {GENRES.map((g) => (
                         <SelectItem key={g} value={g} className="text-xs">
                           {g}
@@ -626,12 +626,12 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
                     onValueChange={(v) => void patchProject({ style: v })}
                   >
                     <SelectTrigger
-                      className="h-9 w-[160px] border-zinc-700 bg-zinc-900 text-xs"
+                      className="h-9 w-[160px] border-stone-300 bg-white text-xs text-stone-900"
                       aria-label="Gaya visual"
                     >
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="border-zinc-700 bg-zinc-900">
+                    <SelectContent className="border-stone-200 bg-[#FCFAF4]">
                       {STYLES.map((s) => (
                         <SelectItem key={s.id} value={s.id} className="text-xs">
                           {s.label}
@@ -644,14 +644,14 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
 
               {/* Tabs */}
               <Tabs value={tab} onValueChange={setTab} className="flex min-h-0 flex-1 flex-col">
-                <TabsList className="mx-3 mt-3 w-fit shrink-0 justify-start bg-zinc-900 sm:mx-4">
+                <TabsList className="mx-3 mt-3 w-fit shrink-0 justify-start bg-stone-200/70 sm:mx-4">
                   <TabsTrigger value="cerita" className="text-xs sm:text-sm">
                     Cerita
                   </TabsTrigger>
                   <TabsTrigger value="karakter" className="text-xs sm:text-sm">
                     Karakter
                     {project.characters.length > 0 && (
-                      <span className="ml-1.5 font-mono text-[10px] text-zinc-500">
+                      <span className="ml-1.5 font-mono text-[10px] text-stone-500">
                         {project.characters.length}
                       </span>
                     )}
@@ -659,7 +659,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
                   <TabsTrigger value="adegan" className="text-xs sm:text-sm">
                     Adegan
                     {sceneCount > 0 && (
-                      <span className="ml-1.5 font-mono text-[10px] text-zinc-500">
+                      <span className="ml-1.5 font-mono text-[10px] text-stone-500">
                         {sceneCount}
                       </span>
                     )}
@@ -724,19 +724,19 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
 
       {/* Dialog proyek baru */}
       <Dialog open={newOpen} onOpenChange={setNewOpen}>
-        <DialogContent className="border-zinc-700 bg-zinc-900 text-zinc-100 sm:max-w-lg">
+        <DialogContent className="border-stone-200 bg-[#FCFAF4] text-stone-900 sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FolderOpen className="h-5 w-5 text-[#C93A1B]" aria-hidden="true" />
               Proyek Baru
             </DialogTitle>
-            <DialogDescription className="text-zinc-400">
+            <DialogDescription className="text-stone-600">
               Isi premis sekecil apa pun — AI yang menuliskan cerita lengkapnya nanti.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="np-title" className="text-xs text-zinc-400">
+              <Label htmlFor="np-title" className="text-xs text-stone-600">
                 Judul proyek
               </Label>
               <Input
@@ -744,20 +744,20 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
                 value={form.title}
                 onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
                 placeholder="mis. Legenda Gunung Kelam"
-                className="border-zinc-700 bg-zinc-950"
+                className="border-stone-300 bg-white text-stone-900 placeholder:text-stone-400"
               />
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="flex flex-col gap-1.5">
-                <Label className="text-xs text-zinc-400">Genre</Label>
+                <Label className="text-xs text-stone-600">Genre</Label>
                 <Select
                   value={form.genre}
                   onValueChange={(v) => setForm((f) => ({ ...f, genre: v }))}
                 >
-                  <SelectTrigger className="border-zinc-700 bg-zinc-950" aria-label="Genre">
+                  <SelectTrigger className="border-stone-300 bg-white text-stone-900" aria-label="Genre">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="border-zinc-700 bg-zinc-900">
+                  <SelectContent className="border-stone-200 bg-[#FCFAF4]">
                     {GENRES.map((g) => (
                       <SelectItem key={g} value={g}>
                         {g}
@@ -767,15 +767,15 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
                 </Select>
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label className="text-xs text-zinc-400">Gaya visual</Label>
+                <Label className="text-xs text-stone-600">Gaya visual</Label>
                 <Select
                   value={form.style}
                   onValueChange={(v) => setForm((f) => ({ ...f, style: v }))}
                 >
-                  <SelectTrigger className="border-zinc-700 bg-zinc-950" aria-label="Gaya visual">
+                  <SelectTrigger className="border-stone-300 bg-white text-stone-900" aria-label="Gaya visual">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="border-zinc-700 bg-zinc-900">
+                  <SelectContent className="border-stone-200 bg-[#FCFAF4]">
                     {STYLES.map((s) => (
                       <SelectItem key={s.id} value={s.id}>
                         {s.label}
@@ -786,7 +786,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
               </div>
             </div>
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="np-premise" className="text-xs text-zinc-400">
+              <Label htmlFor="np-premise" className="text-xs text-stone-600">
                 Premis / ide cerita
               </Label>
               <Textarea
@@ -794,7 +794,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
                 value={form.premise}
                 onChange={(e) => setForm((f) => ({ ...f, premise: e.target.value }))}
                 placeholder="mis. Seorang nelayan muda menemukan lampu tua di pantai yang bisa memanggil badai…"
-                className="min-h-[90px] border-zinc-700 bg-zinc-950"
+                className="min-h-[90px] border-stone-300 bg-white text-stone-900 placeholder:text-stone-400"
               />
             </div>
           </div>
@@ -802,7 +802,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
             <Button
               variant="outline"
               onClick={() => setNewOpen(false)}
-              className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+              className="border-stone-300 bg-white text-stone-700 hover:bg-stone-100 hover:text-stone-900"
             >
               Batal
             </Button>
@@ -824,16 +824,16 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
 
       {/* Konfirmasi hapus proyek */}
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
-        <AlertDialogContent className="border-zinc-700 bg-zinc-900 text-zinc-100">
+        <AlertDialogContent className="border-stone-200 bg-[#FCFAF4] text-stone-900">
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus proyek &quot;{deleteTarget?.title}&quot;?</AlertDialogTitle>
-            <AlertDialogDescription className="text-zinc-400">
+            <AlertDialogDescription className="text-stone-600">
               Seluruh cerita, karakter, adegan, gambar, dan video di proyek ini akan dihapus
               permanen. Tindakan ini tidak bisa dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="border-zinc-700 bg-transparent text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100">
+            <AlertDialogCancel className="border-stone-300 bg-white text-stone-700 hover:bg-stone-100 hover:text-stone-900">
               Batal
             </AlertDialogCancel>
             <AlertDialogAction
