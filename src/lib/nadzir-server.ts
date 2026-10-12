@@ -5,6 +5,8 @@
 import fs from "fs/promises";
 import path from "path";
 
+import ZAI from "z-ai-web-dev-sdk";
+
 export const ASSETS_DIR = path.join(process.cwd(), "db", "assets");
 
 /** Simpan base64 (tanpa prefix data:) menjadi file di db/assets, kembalikan URL-nya. */
@@ -44,19 +46,95 @@ export async function localAssetAsDataUri(url: string): Promise<string | null> {
 }
 
 /**
- * Ekstrak JSON dari balasan LLM (toleran terhadap markdown fence / teks lain).
+ * Perbaiki JSON rusak yang sering dihasilkan LLM untuk teks panjang:
+ * newline literal di dalam string, tanda kutip dialog yang tidak di-escape,
+ * dan trailing comma. State machine sederhana yang sadar posisi string.
+ */
+function repairJson(input: string): string {
+  const out: string[] = [];
+  let inStr = false;
+  let esc = false;
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i] as string;
+    if (inStr) {
+      if (esc) {
+        out.push(ch);
+        esc = false;
+        continue;
+      }
+      if (ch === "\\") {
+        out.push(ch);
+        esc = true;
+        continue;
+      }
+      if (ch === '"') {
+        // kutip penutup jika karakter non-spasi berikutnya adalah struktur JSON;
+        // selain itu itu kutip konten (mis. dialog) -> escape
+        let j = i + 1;
+        while (j < input.length && /\s/.test(input[j] as string)) j++;
+        const next = input[j];
+        if (next === undefined || ",:}]".includes(next)) {
+          inStr = false;
+          out.push(ch);
+        } else {
+          out.push('\\"');
+        }
+        continue;
+      }
+      if (ch === "\n") {
+        out.push("\\n");
+        continue;
+      }
+      if (ch === "\r") continue;
+      if (ch === "\t") {
+        out.push("\\t");
+        continue;
+      }
+      out.push(ch);
+    } else {
+      if (ch === '"') inStr = true;
+      out.push(ch);
+    }
+  }
+  return out.join("").replace(/,\s*([}\]])/g, "$1");
+}
+
+/**
+ * Ekstrak JSON dari balasan LLM (toleran terhadap markdown fence / teks lain /
+ * JSON rusak akibat kutip dialog & newline literal).
  */
 export function extractJson<T = unknown>(raw: string): T | null {
   let t = raw.trim();
   t = t.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "");
-  const start = t.indexOf("{");
-  const end = t.lastIndexOf("}");
-  if (start === -1 || end === -1 || end <= start) return null;
+  const start = Math.min(
+    ...[t.indexOf("{"), t.indexOf("[")].filter((n) => n !== -1),
+  );
+  const end = Math.max(t.lastIndexOf("}"), t.lastIndexOf("]"));
+  if (!Number.isFinite(start) || end === -1 || end <= start) return null;
+  const span = t.slice(start, end + 1);
   try {
-    return JSON.parse(t.slice(start, end + 1)) as T;
+    return JSON.parse(span) as T;
   } catch {
-    return null;
+    // coba perbaiki JSON rusak khas LLM sebelum menyerah
+    try {
+      return JSON.parse(repairJson(span)) as T;
+    } catch {
+      return null;
+    }
   }
+}
+
+/** Panggil LLM untuk satu giliran tanya-jawab teks (backend only). */
+export async function llmComplete(system: string, user: string): Promise<string> {
+  const zai = await ZAI.create();
+  const completion = await zai.chat.completions.create({
+    messages: [
+      { role: "assistant", content: system },
+      { role: "user", content: user },
+    ],
+    thinking: { type: "disabled" },
+  });
+  return completion.choices[0]?.message?.content ?? "";
 }
 
 /** Suffix prompt gaya visual (Inggris) dari id gaya. */
