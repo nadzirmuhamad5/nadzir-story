@@ -23,8 +23,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { SceneData } from "@/lib/nadzir";
+import { IMAGE_MODELS, VIDEO_MODELS, type SceneData } from "@/lib/nadzir";
 
 type Props = {
   scenes: SceneData[];
@@ -32,6 +33,12 @@ type Props = {
   splitBusy: boolean;
   imageBusy: Record<string, boolean>;
   videoBusy: Record<string, boolean>;
+  imageModel: string;
+  videoModel: string;
+  onImageModelChange: (id: string) => void;
+  onVideoModelChange: (id: string) => void;
+  geminiKeySet: boolean;
+  onOpenSettings: () => void;
   onSplitScenes: () => Promise<void>;
   onAddScene: () => Promise<void>;
   onPatchScene: (id: string, fields: Record<string, unknown>) => Promise<void>;
@@ -47,6 +54,12 @@ export default function ScenesTab({
   splitBusy,
   imageBusy,
   videoBusy,
+  imageModel,
+  videoModel,
+  onImageModelChange,
+  onVideoModelChange,
+  geminiKeySet,
+  onOpenSettings,
   onSplitScenes,
   onAddScene,
   onPatchScene,
@@ -102,6 +115,62 @@ export default function ScenesTab({
             {splitBusy ? "Memecah cerita…" : "Bagi Cerita jadi Adegan"}
           </Button>
         </div>
+      </div>
+
+      {/* pemilih model provider */}
+      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-stone-200 bg-[#FCFAF4] px-3.5 py-3">
+        <div className="flex flex-col gap-1">
+          <Label className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
+            Model gambar
+          </Label>
+          <Select value={imageModel} onValueChange={onImageModelChange}>
+            <SelectTrigger
+              className="h-9 w-[230px] border-stone-300 bg-white text-xs text-stone-900"
+              aria-label="Pilih model gambar AI"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="border-stone-200 bg-[#FCFAF4]">
+              {IMAGE_MODELS.map((m) => (
+                <SelectItem key={m.id} value={m.id} className="text-xs">
+                  {m.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex flex-col gap-1">
+          <Label className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
+            Model video
+          </Label>
+          <Select value={videoModel} onValueChange={onVideoModelChange}>
+            <SelectTrigger
+              className="h-9 w-[230px] border-stone-300 bg-white text-xs text-stone-900"
+              aria-label="Pilih model video AI"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="border-stone-200 bg-[#FCFAF4]">
+              {VIDEO_MODELS.map((m) => (
+                <SelectItem key={m.id} value={m.id} className="text-xs">
+                  {m.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {(imageModel.startsWith("gemini:") || videoModel.startsWith("gemini:")) && !geminiKeySet && (
+          <button
+            type="button"
+            onClick={onOpenSettings}
+            className="h-8 rounded-md border border-amber-300 bg-amber-50 px-3 text-[11px] font-semibold text-amber-800 transition-colors hover:bg-amber-100"
+          >
+            Kunci Google AI Studio belum dipasang — klik untuk membuka Pengaturan
+          </button>
+        )}
+        <span className="ml-auto hidden font-mono text-[10px] leading-relaxed text-stone-500 lg:block">
+          Gemini memakai kunci &amp; kuota milikmu sendiri
+        </span>
       </div>
 
       {ordered.length === 0 ? (

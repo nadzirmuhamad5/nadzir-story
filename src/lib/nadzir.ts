@@ -32,6 +32,7 @@ export type SceneData = {
   imageUrl: string | null;
   videoUrl: string | null;
   videoTaskId: string | null;
+  videoProvider: string | null; // null = Nadzir AI; "gemini" = Veo Gemini
   status: string; // draft | video-processing | video-ready | video-failed
 };
 
@@ -111,6 +112,40 @@ export const STYLES: StyleOption[] = [
 export function styleLabelOf(id: string): string {
   return STYLES.find((s) => s.id === id)?.label ?? "Cinematic Realistis";
 }
+
+// ---------------------------------------------------------------------------
+// Katalog model media (Nadzir AI bawaan + Gemini milik pengguna)
+// ---------------------------------------------------------------------------
+
+export type MediaModelOption = {
+  id: string; // "bawaan" atau "gemini:<api>"
+  provider: "nadzir" | "gemini";
+  label: string;
+  kind: "image" | "video";
+};
+
+export const IMAGE_MODELS: MediaModelOption[] = [
+  { id: "bawaan", provider: "nadzir", label: "Nadzir AI (bawaan)", kind: "image" },
+  { id: "gemini:gemini-3-pro-image-preview", provider: "gemini", label: "Nano Banana Pro (Gemini, 4K)", kind: "image" },
+  { id: "gemini:gemini-2.5-flash-image", provider: "gemini", label: "Nano Banana (Gemini, cepat)", kind: "image" },
+];
+
+export const VIDEO_MODELS: MediaModelOption[] = [
+  { id: "bawaan", provider: "nadzir", label: "Nadzir AI (bawaan)", kind: "video" },
+  { id: "gemini:veo-3.1-generate-preview", provider: "gemini", label: "Veo 3.1 (Gemini)", kind: "video" },
+  { id: "gemini:veo-3.1-fast-generate-preview", provider: "gemini", label: "Veo 3.1 Fast (Gemini)", kind: "video" },
+  { id: "gemini:veo-3.0-generate-001", provider: "gemini", label: "Veo 3 (Gemini)", kind: "video" },
+];
+
+export function imageModelOf(id: string): MediaModelOption {
+  return IMAGE_MODELS.find((m) => m.id === id) ?? IMAGE_MODELS[0];
+}
+
+export function videoModelOf(id: string): MediaModelOption {
+  return VIDEO_MODELS.find((m) => m.id === id) ?? VIDEO_MODELS[0];
+}
+
+export type SettingsInfo = { geminiKeySet: boolean; geminiKeyHint: string | null };
 
 export function styleEnOf(id: string): string {
   return STYLES.find((s) => s.id === id)?.en ?? STYLES[0].en;

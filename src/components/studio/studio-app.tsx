@@ -17,6 +17,7 @@ import {
   Github,
   Loader2,
   Plus,
+  Settings,
   Trash2,
 } from "lucide-react";
 
@@ -34,16 +35,32 @@ import {
   api,
   formatDateTime,
   GENRES,
+  imageModelOf,
+  IMAGE_MODELS,
   type ProjectDetail,
   type ProjectSummary,
+  type SettingsInfo,
   STYLES,
+  videoModelOf,
+  VIDEO_MODELS,
 } from "@/lib/nadzir";
 import CharactersTab from "./characters-tab";
 import ExportTab from "./export-tab";
 import ScenesTab from "./scenes-tab";
+import SettingsDialog from "./settings-dialog";
 import StoryTab from "./story-tab";
 
 const GITHUB_URL = "https://github.com/nadzirmuhamad5/nadzir-story";
+
+// pilihan model media dipertahankan antar sesi lewat localStorage
+const LS_IMAGE_MODEL = "ns-image-model";
+const LS_VIDEO_MODEL = "ns-video-model";
+const LS_PORTRAIT_MODEL = "ns-portrait-model";
+
+function lsGet(key: string, fallback: string): string {
+  if (typeof window === "undefined") return fallback;
+  return window.localStorage.getItem(key) ?? fallback;
+}
 
 type NewProjectForm = { title: string; genre: string; style: string; premise: string };
 
@@ -68,6 +85,43 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
   const [imageBusy, setImageBusy] = useState<Record<string, boolean>>({});
   const [portraitBusy, setPortraitBusy] = useState<Record<string, boolean>>({});
   const [videoBusy, setVideoBusy] = useState<Record<string, boolean>>({});
+
+  // pilihan provider/model media (Nadzir AI bawaan vs Gemini milik pengguna)
+  const [imageModel, setImageModel] = useState(() => lsGet(LS_IMAGE_MODEL, "bawaan"));
+  const [videoModel, setVideoModel] = useState(() => lsGet(LS_VIDEO_MODEL, "bawaan"));
+  const [portraitModel, setPortraitModel] = useState(() => lsGet(LS_PORTRAIT_MODEL, "bawaan"));
+  const pickImageModel = (id: string) => {
+    setImageModel(id);
+    try {
+      window.localStorage.setItem(LS_IMAGE_MODEL, id);
+    } catch {}
+  };
+  const pickVideoModel = (id: string) => {
+    setVideoModel(id);
+    try {
+      window.localStorage.setItem(LS_VIDEO_MODEL, id);
+    } catch {}
+  };
+  const pickPortraitModel = (id: string) => {
+    setPortraitModel(id);
+    try {
+      window.localStorage.setItem(LS_PORTRAIT_MODEL, id);
+    } catch {}
+  };
+
+  // pengaturan (kunci API penyedia)
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsInfo, setSettingsInfo] = useState<SettingsInfo | null>(null);
+  const loadSettings = useCallback(async () => {
+    try {
+      setSettingsInfo(await api<SettingsInfo>("/api/settings"));
+    } catch {
+      // biarkan info lama; dialog tetap bisa dibuka
+    }
+  }, []);
+  useEffect(() => {
+    void loadSettings();
+  }, [loadSettings]);
 
   // ------------------------------------------------------------------ data
   const loadProjects = useCallback(async () => {
@@ -266,13 +320,13 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
     try {
       const r = await api<{ scene: ProjectDetail["scenes"][number] }>("/api/ai/image", {
         method: "POST",
-        body: JSON.stringify({ kind: "scene", id: sceneId }),
+        body: JSON.stringify({ kind: "scene", id: sceneId, model: imageModel }),
       });
       setProject((p) =>
         p ? { ...p, scenes: p.scenes.map((s) => (s.id === sceneId ? r.scene : s)) } : p,
       );
       void loadProjects();
-      toast.success("Gambar adegan selesai! 🖼️");
+      toast.success(`Gambar adegan selesai (${imageModelOf(imageModel).label})! 🖼️`);
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -285,7 +339,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
     try {
       const r = await api<{ character: ProjectDetail["characters"][number] }>("/api/ai/image", {
         method: "POST",
-        body: JSON.stringify({ kind: "character", id: characterId }),
+        body: JSON.stringify({ kind: "character", id: characterId, model: portraitModel }),
       });
       setProject((p) =>
         p
@@ -295,7 +349,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
             }
           : p,
       );
-      toast.success("Potret karakter selesai! 🧑‍🎨");
+      toast.success(`Potret karakter selesai (${imageModelOf(portraitModel).label})! 🧑‍🎨`);
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -346,19 +400,23 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
     try {
       await api<{ taskId: string }>("/api/ai/video/start", {
         method: "POST",
-        body: JSON.stringify({ sceneId }),
+        body: JSON.stringify({ sceneId, model: videoModel }),
       });
       setProject((p) =>
         p
           ? {
               ...p,
               scenes: p.scenes.map((s) =>
-                s.id === sceneId ? { ...s, status: "video-processing" } : s,
+                s.id === sceneId
+                  ? { ...s, status: "video-processing", videoProvider: videoModelOf(videoModel).provider === "gemini" ? "gemini" : null }
+                  : s,
               ),
             }
           : p,
       );
-      toast.info("Video sedang diproses di server (1–5 menit). Aman untuk pindah tab lain.");
+      toast.info(
+        `Video dirender via ${videoModelOf(videoModel).label} (1–5 menit). Aman untuk pindah tab lain.`,
+      );
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -499,6 +557,18 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
           >
             <Plus className="h-4 w-4" aria-hidden="true" />
             <span className="hidden sm:inline">Proyek Baru</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              void loadSettings();
+              setSettingsOpen(true);
+            }}
+            aria-label="Buka pengaturan"
+            className="h-9 w-9 shrink-0 text-stone-500 hover:bg-stone-200/70 hover:text-stone-900"
+          >
+            <Settings className="h-4 w-4" aria-hidden="true" />
           </Button>
           <a
             href={GITHUB_URL}
@@ -682,6 +752,8 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
                     <CharactersTab
                       characters={project.characters}
                       busyMap={portraitBusy}
+                      portraitModel={portraitModel}
+                      onPortraitModelChange={pickPortraitModel}
                       onAdd={addCharacter}
                       onPatch={patchCharacter}
                       onDelete={deleteCharacter}
@@ -695,6 +767,15 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
                       splitBusy={splitBusy}
                       imageBusy={imageBusy}
                       videoBusy={videoBusy}
+                      imageModel={imageModel}
+                      videoModel={videoModel}
+                      onImageModelChange={pickImageModel}
+                      onVideoModelChange={pickVideoModel}
+                      geminiKeySet={!!settingsInfo?.geminiKeySet}
+                      onOpenSettings={() => {
+                        void loadSettings();
+                        setSettingsOpen(true);
+                      }}
                       onSplitScenes={splitScenes}
                       onAddScene={addScene}
                       onPatchScene={patchScene}
@@ -845,6 +926,16 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Pengaturan penyedia AI (kunci Gemini) */}
+      <SettingsDialog
+        key={String(settingsOpen)}
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        info={settingsInfo}
+        onSaved={setSettingsInfo}
+      />
     </div>
   );
 }
+

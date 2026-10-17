@@ -35,17 +35,24 @@ model Character {
 }
 
 model Scene {
-  id          String   @id @default(cuid())
-  projectId   String
-  order       Int      @default(0)
-  title       String   @default("")
-  narration   String   @default("")
-  imagePrompt String   @default("")
-  videoPrompt String   @default("")
-  imageUrl    String?
-  videoUrl    String?
-  videoTaskId String?
-  status      String   @default("draft")
-  createdAt   DateTime @default(now())
-  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id            String   @id @default(cuid())
+  projectId     String
+  order         Int      @default(0)
+  title         String   @default("")
+  narration     String   @default("")
+  imagePrompt   String   @default("")
+  videoPrompt   String   @default("")
+  imageUrl      String?
+  videoUrl      String?
+  videoTaskId   String?
+  videoProvider String?  // null = Nadzir AI bawaan; "gemini" = operasi Veo Gemini
+  status        String   @default("draft")
+  createdAt     DateTime @default(now())
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// Penyimpanan key-value sederhana (mis. kunci API penyedia yang dipakai user).
+model Setting {
+  key   String @id
+  value String
 }

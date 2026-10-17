@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import ZAI from "z-ai-web-dev-sdk";
 
 import { db } from "@/lib/db";
+import { getGeminiKey, geminiPollVideo, saveGeminiVideo } from "@/lib/gemini-server";
 import { downloadAsset } from "@/lib/nadzir-server";
 
 /**
  * GET /api/ai/video/status?sceneId=... — cek status render video adegan.
- * Bila SUCCESS, video diunduh ke server lokal lalu URL-nya disimpan di adegan.
+ * Jalur ditentukan scene.videoProvider: "gemini" (operasi Veo milik pengguna)
+ * atau bawaan Nadzir AI. Bila SUCCESS, video disimpan lokal lalu URL-nya
+ * disimpan di adegan.
  */
 export async function GET(req: NextRequest) {
   try {
@@ -22,6 +25,36 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Adegan ini tidak sedang merender video" }, { status: 400 });
     }
 
+    // ------------------------------------------------------------ Gemini Veo
+    if (scene.videoProvider === "gemini") {
+      const key = await getGeminiKey();
+      if (!key) {
+        await db.scene.update({
+          where: { id: sceneId },
+          data: { status: "video-failed", videoTaskId: null, videoProvider: null },
+        });
+        return NextResponse.json({ status: "FAIL" });
+      }
+      const poll = await geminiPollVideo(key, scene.videoTaskId);
+      if (poll.state === "PROCESSING") {
+        return NextResponse.json({ status: "PROCESSING" });
+      }
+      if (poll.state === "FAIL") {
+        await db.scene.update({
+          where: { id: sceneId },
+          data: { status: "video-failed", videoTaskId: null, videoProvider: null },
+        });
+        return NextResponse.json({ status: "FAIL", message: poll.message });
+      }
+      const videoUrl = await saveGeminiVideo(poll.b64, `video-${scene.id}-${Date.now()}.mp4`);
+      await db.scene.update({
+        where: { id: sceneId },
+        data: { videoUrl, status: "video-ready", videoTaskId: null, videoProvider: null },
+      });
+      return NextResponse.json({ status: "SUCCESS", videoUrl });
+    }
+
+    // -------------------------------------------------------- Nadzir AI bawaan
     const zai = await ZAI.create();
     const result = (await zai.async.result.query(scene.videoTaskId)) as {
       task_status?: string;

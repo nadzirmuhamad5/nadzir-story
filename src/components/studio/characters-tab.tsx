@@ -15,12 +15,15 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { CharacterData } from "@/lib/nadzir";
+import { IMAGE_MODELS, type CharacterData } from "@/lib/nadzir";
 
 type Props = {
   characters: CharacterData[];
   busyMap: Record<string, boolean>;
+  portraitModel: string;
+  onPortraitModelChange: (id: string) => void;
   onAdd: (name: string, description: string) => Promise<void>;
   onPatch: (id: string, fields: Record<string, unknown>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
@@ -30,6 +33,8 @@ type Props = {
 export default function CharactersTab({
   characters,
   busyMap,
+  portraitModel,
+  onPortraitModelChange,
   onAdd,
   onPatch,
   onDelete,
@@ -86,13 +91,30 @@ export default function CharactersTab({
             Deskripsi karakter dipakai AI saat membuat potret &amp; konsistensi wajah.
           </p>
         </div>
-        <Button
-          onClick={openCreate}
-          className="h-10 bg-[#C93A1B] px-4 font-semibold text-white hover:bg-[#A92F14]"
-        >
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          Tambah Karakter
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Select value={portraitModel} onValueChange={onPortraitModelChange}>
+            <SelectTrigger
+              className="h-10 w-[230px] border-stone-300 bg-white text-xs text-stone-900"
+              aria-label="Pilih model potret AI"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="border-stone-200 bg-[#FCFAF4]">
+              {IMAGE_MODELS.map((m) => (
+                <SelectItem key={m.id} value={m.id} className="text-xs">
+                  {m.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            onClick={openCreate}
+            className="h-10 bg-[#C93A1B] px-4 font-semibold text-white hover:bg-[#A92F14]"
+          >
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            Tambah Karakter
+          </Button>
+        </div>
       </div>
 
       {characters.length === 0 ? (
