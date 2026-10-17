@@ -3,12 +3,21 @@ import ZAI from "z-ai-web-dev-sdk";
 
 import { db } from "@/lib/db";
 import { getGeminiKey, geminiGenerateImage } from "@/lib/gemini-server";
-import { saveBase64Asset, styleEnOf } from "@/lib/nadzir-server";
+import {
+  extFromUrl,
+  getHfKey,
+  hfGenerateImageWait,
+  hfImageBody,
+  hfModelOf,
+} from "@/lib/higgsfield-server";
+import { downloadAsset, saveBase64Asset, styleEnOf } from "@/lib/nadzir-server";
 
 /**
  * POST /api/ai/image — generate gambar AI untuk adegan (16:9) atau karakter (1:1).
  * body: { kind: "scene" | "character", id: string, prompt?: string, model?: string }
- * model "gemini:<api>" memakai kunci Google AI Studio milik pengguna (tabel Setting).
+ * model "gemini:<api>" memakai kunci Google AI Studio milik pengguna;
+ * model "hf:<endpoint>" memakai kunci Higgsfield milik pengguna;
+ * tanpa model memakai Z.AI bawaan.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -16,7 +25,9 @@ export async function POST(req: NextRequest) {
     if (!body.id || (body.kind !== "scene" && body.kind !== "character")) {
       return NextResponse.json({ error: "kind & id wajib diisi" }, { status: 400 });
     }
-    const useGemini = typeof body.model === "string" && body.model.startsWith("gemini:");
+    const model = typeof body.model === "string" ? body.model : "";
+    const useGemini = model.startsWith("gemini:");
+    const useHf = model.startsWith("hf:");
 
     let prompt = (body.prompt ?? "").trim();
     let aspectRatio = "1:1";
@@ -53,9 +64,26 @@ export async function POST(req: NextRequest) {
       prompt = `${prompt}. Character reference portrait, upper body, clean simple background, highly detailed, consistent design, no text, no watermark.`;
     }
 
+    let savedUrl: string | null = null;
     let b64: string | undefined;
 
-    if (useGemini) {
+    if (useHf) {
+      const key = await getHfKey();
+      if (!key) {
+        return NextResponse.json(
+          { error: "Model Higgsfield butuh kunci API — pasang dulu di Pengaturan" },
+          { status: 400 },
+        );
+      }
+      const m = hfModelOf(model.slice("hf:".length));
+      if (!m || m.kind !== "image") {
+        return NextResponse.json({ error: "Model Higgsfield tidak dikenal" }, { status: 400 });
+      }
+      const aspect = body.kind === "scene" ? "16:9" : "1:1";
+      const hfBody = hfImageBody(m, prompt, aspect);
+      const { imageUrl } = await hfGenerateImageWait(m.id, hfBody, key);
+      savedUrl = await downloadAsset(imageUrl, `${filenameBase}${extFromUrl(imageUrl)}`);
+    } else if (useGemini) {
       const key = await getGeminiKey();
       if (!key) {
         return NextResponse.json(
@@ -63,7 +91,7 @@ export async function POST(req: NextRequest) {
           { status: 400 },
         );
       }
-      const api = body.model!.slice("gemini:".length);
+      const api = model.slice("gemini:".length);
       const imageSize = api === "gemini-3-pro-image-preview" ? "2K" : null;
       const img = await geminiGenerateImage(key, { api, prompt, aspectRatio, imageSize });
       b64 = img.b64;
@@ -76,11 +104,10 @@ export async function POST(req: NextRequest) {
       b64 = response.data?.[0]?.base64;
     }
 
-    if (!b64) {
+    const url = savedUrl ?? (b64 ? await saveBase64Asset(b64, `${filenameBase}.png`) : null);
+    if (!url) {
       return NextResponse.json({ error: "AI tidak mengembalikan gambar — coba lagi" }, { status: 502 });
     }
-
-    const url = await saveBase64Asset(b64, `${filenameBase}.png`);
 
     if (body.kind === "scene") {
       const scene = await db.scene.update({

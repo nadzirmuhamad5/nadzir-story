@@ -42,6 +42,7 @@ import {
   type SettingsInfo,
   STYLES,
   videoModelOf,
+  videoProviderFlagOf,
   VIDEO_MODELS,
 } from "@/lib/nadzir";
 import CharactersTab from "./characters-tab";
@@ -86,7 +87,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
   const [portraitBusy, setPortraitBusy] = useState<Record<string, boolean>>({});
   const [videoBusy, setVideoBusy] = useState<Record<string, boolean>>({});
 
-  // pilihan provider/model media (Nadzir AI bawaan vs Gemini milik pengguna)
+  // pilihan provider/model media (Z.AI bawaan vs Gemini/Higgsfield milik pengguna)
   const [imageModel, setImageModel] = useState(() => lsGet(LS_IMAGE_MODEL, "bawaan"));
   const [videoModel, setVideoModel] = useState(() => lsGet(LS_VIDEO_MODEL, "bawaan"));
   const [portraitModel, setPortraitModel] = useState(() => lsGet(LS_PORTRAIT_MODEL, "bawaan"));
@@ -408,7 +409,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
               ...p,
               scenes: p.scenes.map((s) =>
                 s.id === sceneId
-                  ? { ...s, status: "video-processing", videoProvider: videoModelOf(videoModel).provider === "gemini" ? "gemini" : null }
+                  ? { ...s, status: "video-processing", videoProvider: videoProviderFlagOf(videoModel) }
                   : s,
               ),
             }
@@ -754,6 +755,12 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
                       busyMap={portraitBusy}
                       portraitModel={portraitModel}
                       onPortraitModelChange={pickPortraitModel}
+                      geminiKeySet={!!settingsInfo?.geminiKeySet}
+                      higgsfieldKeySet={!!settingsInfo?.higgsfieldKeySet}
+                      onOpenSettings={() => {
+                        void loadSettings();
+                        setSettingsOpen(true);
+                      }}
                       onAdd={addCharacter}
                       onPatch={patchCharacter}
                       onDelete={deleteCharacter}
@@ -772,6 +779,7 @@ export default function StudioApp({ onBack }: { onBack: () => void }) {
                       onImageModelChange={pickImageModel}
                       onVideoModelChange={pickVideoModel}
                       geminiKeySet={!!settingsInfo?.geminiKeySet}
+                      higgsfieldKeySet={!!settingsInfo?.higgsfieldKeySet}
                       onOpenSettings={() => {
                         void loadSettings();
                         setSettingsOpen(true);

@@ -23,9 +23,9 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { IMAGE_MODELS, VIDEO_MODELS, type SceneData } from "@/lib/nadzir";
+import { IMAGE_MODELS, VIDEO_MODELS, type MediaModelOption, type SceneData } from "@/lib/nadzir";
 
 type Props = {
   scenes: SceneData[];
@@ -38,6 +38,7 @@ type Props = {
   onImageModelChange: (id: string) => void;
   onVideoModelChange: (id: string) => void;
   geminiKeySet: boolean;
+  higgsfieldKeySet: boolean;
   onOpenSettings: () => void;
   onSplitScenes: () => Promise<void>;
   onAddScene: () => Promise<void>;
@@ -59,6 +60,7 @@ export default function ScenesTab({
   onImageModelChange,
   onVideoModelChange,
   geminiKeySet,
+  higgsfieldKeySet,
   onOpenSettings,
   onSplitScenes,
   onAddScene,
@@ -72,6 +74,16 @@ export default function ScenesTab({
   const [confirmSplit, setConfirmSplit] = useState(false);
 
   const ordered = [...scenes].sort((a, b) => a.order - b.order);
+
+  const byProvider = (kind: "image" | "video", provider: MediaModelOption["provider"]) =>
+    (kind === "image" ? IMAGE_MODELS : VIDEO_MODELS).filter((m) => m.provider === provider);
+
+  // peringatan kunci: provider terpilih yang kuncinya belum dipasang
+  const missingKeys: string[] = [];
+  if ((imageModel.startsWith("gemini:") || videoModel.startsWith("gemini:")) && !geminiKeySet)
+    missingKeys.push("Google AI Studio (Gemini)");
+  if ((imageModel.startsWith("hf:") || videoModel.startsWith("hf:")) && !higgsfieldKeySet)
+    missingKeys.push("Higgsfield");
 
   const split = async () => {
     if (ordered.length > 0) {
@@ -125,17 +137,42 @@ export default function ScenesTab({
           </Label>
           <Select value={imageModel} onValueChange={onImageModelChange}>
             <SelectTrigger
-              className="h-9 w-[230px] border-stone-300 bg-white text-xs text-stone-900"
+              className="h-9 w-[240px] border-stone-300 bg-white text-xs text-stone-900"
               aria-label="Pilih model gambar AI"
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="border-stone-200 bg-[#FCFAF4]">
-              {IMAGE_MODELS.map((m) => (
-                <SelectItem key={m.id} value={m.id} className="text-xs">
-                  {m.label}
-                </SelectItem>
-              ))}
+            <SelectContent className="max-h-80 border-stone-200 bg-[#FCFAF4]">
+              <SelectGroup>
+                <SelectLabel className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
+                  Z.AI · Bawaan (gratis)
+                </SelectLabel>
+                {byProvider("image", "zai").map((m) => (
+                  <SelectItem key={m.id} value={m.id} className="text-xs">
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
+                  Gemini · kunci milikmu
+                </SelectLabel>
+                {byProvider("image", "gemini").map((m) => (
+                  <SelectItem key={m.id} value={m.id} className="text-xs">
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
+                  Higgsfield · kunci milikmu
+                </SelectLabel>
+                {byProvider("image", "higgsfield").map((m) => (
+                  <SelectItem key={m.id} value={m.id} className="text-xs">
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
@@ -145,31 +182,56 @@ export default function ScenesTab({
           </Label>
           <Select value={videoModel} onValueChange={onVideoModelChange}>
             <SelectTrigger
-              className="h-9 w-[230px] border-stone-300 bg-white text-xs text-stone-900"
+              className="h-9 w-[240px] border-stone-300 bg-white text-xs text-stone-900"
               aria-label="Pilih model video AI"
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="border-stone-200 bg-[#FCFAF4]">
-              {VIDEO_MODELS.map((m) => (
-                <SelectItem key={m.id} value={m.id} className="text-xs">
-                  {m.label}
-                </SelectItem>
-              ))}
+            <SelectContent className="max-h-80 border-stone-200 bg-[#FCFAF4]">
+              <SelectGroup>
+                <SelectLabel className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
+                  Z.AI · Bawaan (gratis)
+                </SelectLabel>
+                {byProvider("video", "zai").map((m) => (
+                  <SelectItem key={m.id} value={m.id} className="text-xs">
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
+                  Gemini · kunci milikmu
+                </SelectLabel>
+                {byProvider("video", "gemini").map((m) => (
+                  <SelectItem key={m.id} value={m.id} className="text-xs">
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
+                  Higgsfield · kunci milikmu
+                </SelectLabel>
+                {byProvider("video", "higgsfield").map((m) => (
+                  <SelectItem key={m.id} value={m.id} className="text-xs">
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
         </div>
-        {(imageModel.startsWith("gemini:") || videoModel.startsWith("gemini:")) && !geminiKeySet && (
+        {missingKeys.length > 0 && (
           <button
             type="button"
             onClick={onOpenSettings}
             className="h-8 rounded-md border border-amber-300 bg-amber-50 px-3 text-[11px] font-semibold text-amber-800 transition-colors hover:bg-amber-100"
           >
-            Kunci Google AI Studio belum dipasang — klik untuk membuka Pengaturan
+            Kunci {missingKeys.join(" & ")} belum dipasang — klik untuk membuka Pengaturan
           </button>
         )}
         <span className="ml-auto hidden font-mono text-[10px] leading-relaxed text-stone-500 lg:block">
-          Gemini memakai kunci &amp; kuota milikmu sendiri
+          Z.AI gratis · Gemini &amp; Higgsfield memakai kunci &amp; kuota milikmu sendiri
         </span>
       </div>
 

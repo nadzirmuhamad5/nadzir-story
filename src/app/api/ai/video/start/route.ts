@@ -3,6 +3,13 @@ import ZAI from "z-ai-web-dev-sdk";
 
 import { db } from "@/lib/db";
 import { getGeminiKey, geminiStartVideo } from "@/lib/gemini-server";
+import {
+  getHfKey,
+  hfModelOf,
+  hfSubmit,
+  hfUploadImage,
+  hfVideoBody,
+} from "@/lib/higgsfield-server";
 import { localAssetAsDataUri } from "@/lib/nadzir-server";
 
 /**
@@ -11,7 +18,8 @@ import { localAssetAsDataUri } from "@/lib/nadzir-server";
  * kalau tidak ada jatuh ke text-to-video.
  * body: { sceneId: string, prompt?: string, model?: string }
  * model "gemini:<api>" menjalankan operasi Veo dengan kunci pengguna;
- * scene.videoProvider dicatat "gemini" agar polling tahu jalurnya.
+ * model "hf:<endpoint>" menjalankan pekerjaan Higgsfield dengan kunci pengguna;
+ * scene.videoProvider dicatat ("gemini"/"higgsfield") agar polling tahu jalurnya.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -70,7 +78,43 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ taskId: operationName });
     }
 
-    // ------------------------------------------------------- Nadzir AI bawaan
+    // -------------------------------------------------------- Higgsfield
+    if (typeof model === "string" && model.startsWith("hf:")) {
+      const key = await getHfKey();
+      if (!key) {
+        return NextResponse.json(
+          { error: "Model Higgsfield butuh kunci API — pasang dulu di Pengaturan" },
+          { status: 400 },
+        );
+      }
+      const m = hfModelOf(model.slice("hf:".length));
+      if (!m || m.kind !== "video") {
+        return NextResponse.json({ error: "Model Higgsfield tidak dikenal" }, { status: 400 });
+      }
+      // gambar adegan jadi frame pertama / referensi — perlu diunggah dulu
+      let imageUrl: string | null = null;
+      if (scene.imageUrl) {
+        const dataUri = await localAssetAsDataUri(scene.imageUrl);
+        if (dataUri) imageUrl = await hfUploadImage(dataUri, key);
+      }
+      if (!imageUrl && m.input.field && m.required.includes(m.input.field)) {
+        return NextResponse.json(
+          {
+            error: `Adegan ini belum punya gambar — ${m.name} butuh frame pertama. Buat gambar adegan dulu, atau pilih model yang bisa tanpa gambar (mis. Cinema Studio 4.0 / Veo).`,
+          },
+          { status: 400 },
+        );
+      }
+      const hfBody = hfVideoBody(m, finalPrompt, imageUrl, 8, "16:9");
+      const requestId = await hfSubmit(m.id, hfBody, key);
+      await db.scene.update({
+        where: { id: sceneId },
+        data: { videoTaskId: requestId, videoProvider: "higgsfield", status: "video-processing" },
+      });
+      return NextResponse.json({ taskId: requestId });
+    }
+
+    // ------------------------------------------------------- Z.AI bawaan
     const zai = await ZAI.create();
     const params: Record<string, unknown> = {
       prompt: finalPrompt,

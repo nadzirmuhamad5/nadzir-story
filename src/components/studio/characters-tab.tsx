@@ -15,15 +15,18 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { IMAGE_MODELS, type CharacterData } from "@/lib/nadzir";
+import { IMAGE_MODELS, type CharacterData, type MediaModelOption } from "@/lib/nadzir";
 
 type Props = {
   characters: CharacterData[];
   busyMap: Record<string, boolean>;
   portraitModel: string;
   onPortraitModelChange: (id: string) => void;
+  geminiKeySet: boolean;
+  higgsfieldKeySet: boolean;
+  onOpenSettings: () => void;
   onAdd: (name: string, description: string) => Promise<void>;
   onPatch: (id: string, fields: Record<string, unknown>) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
@@ -35,6 +38,9 @@ export default function CharactersTab({
   busyMap,
   portraitModel,
   onPortraitModelChange,
+  geminiKeySet,
+  higgsfieldKeySet,
+  onOpenSettings,
   onAdd,
   onPatch,
   onDelete,
@@ -94,19 +100,55 @@ export default function CharactersTab({
         <div className="flex flex-wrap items-center gap-2">
           <Select value={portraitModel} onValueChange={onPortraitModelChange}>
             <SelectTrigger
-              className="h-10 w-[230px] border-stone-300 bg-white text-xs text-stone-900"
+              className="h-10 w-[240px] border-stone-300 bg-white text-xs text-stone-900"
               aria-label="Pilih model potret AI"
             >
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="border-stone-200 bg-[#FCFAF4]">
-              {IMAGE_MODELS.map((m) => (
-                <SelectItem key={m.id} value={m.id} className="text-xs">
-                  {m.label}
-                </SelectItem>
-              ))}
+            <SelectContent className="max-h-80 border-stone-200 bg-[#FCFAF4]">
+              <SelectGroup>
+                <SelectLabel className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
+                  Z.AI · Bawaan (gratis)
+                </SelectLabel>
+                {IMAGE_MODELS.filter((m) => m.provider === "zai").map((m) => (
+                  <SelectItem key={m.id} value={m.id} className="text-xs">
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
+                  Gemini · kunci milikmu
+                </SelectLabel>
+                {IMAGE_MODELS.filter((m) => m.provider === "gemini").map((m) => (
+                  <SelectItem key={m.id} value={m.id} className="text-xs">
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel className="font-mono text-[10px] uppercase tracking-widest text-stone-500">
+                  Higgsfield · kunci milikmu
+                </SelectLabel>
+                {IMAGE_MODELS.filter((m: MediaModelOption) => m.provider === "higgsfield").map((m) => (
+                  <SelectItem key={m.id} value={m.id} className="text-xs">
+                    {m.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
             </SelectContent>
           </Select>
+          {(portraitModel.startsWith("gemini:") && !geminiKeySet) ||
+          (portraitModel.startsWith("hf:") && !higgsfieldKeySet) ? (
+            <button
+              type="button"
+              onClick={onOpenSettings}
+              className="h-10 rounded-md border border-amber-300 bg-amber-50 px-3 text-[11px] font-semibold text-amber-800 transition-colors hover:bg-amber-100"
+            >
+              Kunci {portraitModel.startsWith("hf:") ? "Higgsfield" : "Google AI Studio (Gemini)"} belum
+              dipasang — buka Pengaturan
+            </button>
+          ) : null}
           <Button
             onClick={openCreate}
             className="h-10 bg-[#C93A1B] px-4 font-semibold text-white hover:bg-[#A92F14]"

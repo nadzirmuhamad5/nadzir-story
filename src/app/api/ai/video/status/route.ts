@@ -3,13 +3,14 @@ import ZAI from "z-ai-web-dev-sdk";
 
 import { db } from "@/lib/db";
 import { getGeminiKey, geminiPollVideo, saveGeminiVideo } from "@/lib/gemini-server";
+import { HfError, getHfKey, hfPollOnce } from "@/lib/higgsfield-server";
 import { downloadAsset } from "@/lib/nadzir-server";
 
 /**
  * GET /api/ai/video/status?sceneId=... — cek status render video adegan.
- * Jalur ditentukan scene.videoProvider: "gemini" (operasi Veo milik pengguna)
- * atau bawaan Nadzir AI. Bila SUCCESS, video disimpan lokal lalu URL-nya
- * disimpan di adegan.
+ * Jalur ditentukan scene.videoProvider: "gemini" (operasi Veo milik pengguna),
+ * "higgsfield" (pekerjaan Higgsfield milik pengguna), atau bawaan Z.AI.
+ * Bila SUCCESS, video disimpan lokal lalu URL-nya disimpan di adegan.
  */
 export async function GET(req: NextRequest) {
   try {
@@ -54,7 +55,56 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ status: "SUCCESS", videoUrl });
     }
 
-    // -------------------------------------------------------- Nadzir AI bawaan
+    // ------------------------------------------------------ Higgsfield
+    if (scene.videoProvider === "higgsfield") {
+      const key = await getHfKey();
+      if (!key) {
+        await db.scene.update({
+          where: { id: sceneId },
+          data: { status: "video-failed", videoTaskId: null, videoProvider: null },
+        });
+        return NextResponse.json({ status: "FAIL" });
+      }
+      let poll;
+      try {
+        poll = await hfPollOnce(scene.videoTaskId, key);
+      } catch (e) {
+        // error sementara (jaringan / 5xx / konkurensi) jangan langsung gagalkan adegan
+        if (e instanceof HfError && e.retryable) {
+          return NextResponse.json({ status: "PROCESSING" });
+        }
+        await db.scene.update({
+          where: { id: sceneId },
+          data: { status: "video-failed", videoTaskId: null, videoProvider: null },
+        });
+        return NextResponse.json({ status: "FAIL", message: (e as Error).message });
+      }
+      if (poll.state === "PROCESSING") {
+        return NextResponse.json({ status: "PROCESSING" });
+      }
+      if (poll.state === "FAIL") {
+        await db.scene.update({
+          where: { id: sceneId },
+          data: { status: "video-failed", videoTaskId: null, videoProvider: null },
+        });
+        return NextResponse.json({ status: "FAIL", message: poll.message });
+      }
+      if (!poll.videoUrl) {
+        await db.scene.update({
+          where: { id: sceneId },
+          data: { status: "video-failed", videoTaskId: null, videoProvider: null },
+        });
+        return NextResponse.json({ status: "FAIL", message: "Higgsfield selesai tanpa file video" });
+      }
+      const videoUrl = await downloadAsset(poll.videoUrl, `video-${scene.id}-${Date.now()}.mp4`);
+      await db.scene.update({
+        where: { id: sceneId },
+        data: { videoUrl, status: "video-ready", videoTaskId: null, videoProvider: null },
+      });
+      return NextResponse.json({ status: "SUCCESS", videoUrl });
+    }
+
+    // -------------------------------------------------------- Z.AI bawaan
     const zai = await ZAI.create();
     const result = (await zai.async.result.query(scene.videoTaskId)) as {
       task_status?: string;
